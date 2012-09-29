@@ -34,7 +34,11 @@ class GDash
       options[:until] ||= graph_until
       
       graph_generators = files_with_extension("graph_gen")
+      puts "gens: #{graph_generators}"
       graph_generators.each do |graph_generator|
+        puts "inside - graphite base: #{@graphite_base}"
+        puts "inside - directory: #{directory}"
+        puts "inside - graph generator: #{graph_generator}"
         GraphiteGraphGenerator.new(@graphite_base, @directory, graph_generator)
       end
 

@@ -10,12 +10,16 @@ class GDash
   require 'gdash/sinatra_app'
   require 'graphite_graph'
   require 'graphite_graph_gen'
+  require 'rack/debug'
+  require 'ruby-debug'
 
   attr_reader :graphite_base, :graphite_render, :dash_templates, :height, :width, :from, :until
 
   def initialize(graphite_base, render_url, dash_templates, options={})
     @graphite_base = graphite_base
+    debugger
     @graphite_render = [@graphite_base, "/render/"].join
+    puts "graphite_render: #{@graphite_render}"
     @dash_templates = dash_templates
     @height = options.delete(:height)
     @width = options.delete(:width)
@@ -30,7 +34,8 @@ class GDash
     options[:height] ||= @height
     options[:from] ||= @from
     options[:until] ||= @until
-
+    puts "graphite_base: #{@graphite_base}"
+    
     Dashboard.new(@graphite_base, name, dash_templates, options)
   end
 

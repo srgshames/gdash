@@ -16,4 +16,12 @@ if config[:username] && config[:password]
   end
 end
 
-run GDash::SinatraApp.new(config[:graphite], config[:templatedir], config[:options])
+log = File.new("sinatra.log", "a+")
+$stdout.reopen(log)
+$stderr.reopen(log)
+
+require 'rack/debug'
+#Rack::Builder.new do
+  use Rack::Debug
+  run GDash::SinatraApp.new(config[:graphite], config[:templatedir], config[:options])
+#end
