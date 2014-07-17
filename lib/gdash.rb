@@ -3,6 +3,7 @@ require 'sinatra'
 require 'yaml'
 require 'erb'
 require 'redcarpet'
+require 'less'
 
 class GDash
   require 'gdash/dashboard'
@@ -11,12 +12,14 @@ class GDash
   require 'graphite_graph'
   require 'graphite_graph_gen'
 
-  attr_reader :graphite_base, :graphite_render, :dash_templates, :height, :width, :from, :until
+  attr_reader :graphite_base, :graphite_render, :graph_templates, :category, :dash_templates, :height, :width, :from, :until
 
-  def initialize(graphite_base, render_url, dash_templates, options={})
+  def initialize(graphite_base, render_url, graph_templates, category,  options={})
     @graphite_base = graphite_base
     @graphite_render = [@graphite_base, "/render/"].join
-    @dash_templates = dash_templates
+    @graph_templates = graph_templates
+    @category = category
+    @dash_templates = File.join(graph_templates, category)
     @height = options.delete(:height)
     @width = options.delete(:width)
     @from = options.delete(:from)
@@ -31,7 +34,7 @@ class GDash
     options[:from] ||= @from
     options[:until] ||= @until
 
-    Dashboard.new(@graphite_base, name, dash_templates, options)
+    Dashboard.new(@graphite_base, name, graph_templates, category, options, graphite_render)
   end
 
   def list
@@ -45,7 +48,7 @@ class GDash
       begin
         yaml_file = File.join(dash_templates, dash, "dash.yaml")
         if File.exist?(yaml_file)
-          dashboards << YAML.load_file(yaml_file).merge({:link => dash})
+          dashboards << YAML.load_file(yaml_file).merge({:category => category, :link => dash})
         end
       rescue Exception => e
         p e
